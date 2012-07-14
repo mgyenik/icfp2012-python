@@ -7,21 +7,27 @@ moves = dict({
         "none" :(0, 0)
         })
 
-class Minemap:
+class MapOccupier(object):
+    def update(self):
+        raise NotImplementedError("update not implemented")
+
+class Minemap(object):
     #This is the map 
-    
+    tiles = []
+
     def __init__(self, linkmap):
         self.next_map = linkmap
         return
         #do some stuff
 
     def update(self):
+        #call update on all tiles
         #write update stuff to new map and return it
         return next_map
 
 
 
-class Rock:
+class Rock(MapOccupier):
     
     coords = (0, 0)
 
@@ -34,3 +40,18 @@ class Rock:
         dx, dy = moves.get(move)
         coords = (x+dx, y+dy)
         return
+
+    def update(self, minemap):
+        #check around you in minemap and update accordingly
+        return self
+
+
+class Robot(MapOccupier):
+    coords = (0, 0)
+
+    def __init__(self, new_coords):
+        coords = new_coords
+        return
+    
+    def update(self, minemap):
+        return self
