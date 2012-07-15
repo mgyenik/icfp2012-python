@@ -157,10 +157,14 @@ class Rock(MapOccupier):
             elif minemap.get((x-1, y)) == Air and minemap.get((x-1, y-1)) == Air:
                  minemap[coord] = Air
                  minemap[(x-1, y-1)] = Rock
+            else:
+                minemap[coord] = Rock
         elif lower == Lambda:
             if minemap.get((x+1, y)) == Air and minemap.get((x+1, y-1)) == Air:
                 minemap[coord] = Air
                 minemap[(x+1, y-1)] = Rock
+            else:
+                minemap[coord] = Rock
         else:
             minemap[coord] = Rock
 
@@ -226,6 +230,7 @@ class Robot(MapOccupier):
                 minemap[(xp, y)] = Robot
                 minemap[coord] = Air
         else:
+            print "default case"
             minemap[coord] = Robot
 
     @staticmethod
