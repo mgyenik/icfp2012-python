@@ -12,7 +12,7 @@ class MapOccupier(object):
         raise NotImplementedError("update not implemented")
 
 class Minemap(object):
-    #This is the map 
+    #This is the map
     tiles = []
 
     def __init__(self, linkmap):
@@ -28,7 +28,7 @@ class Minemap(object):
 
 
 class Rock(MapOccupier):
-    
+
     coords = (0, 0)
 
     def __init__(self, new_coords):
@@ -52,6 +52,6 @@ class Robot(MapOccupier):
     def __init__(self, new_coords):
         coords = new_coords
         return
-    
+
     def update(self, minemap):
         return self
