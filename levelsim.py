@@ -78,7 +78,9 @@ class Rock(MapOccupier):
             if minemap.get((x+1, y)) == Air and minemap.get((x+1, y-1)) == Air:
                 minemap[coord] = Air
                 minemap[(x+1, y-1)] = Rock
-             else if minemap.get((x-1, y)) == Air and minemap.get((x-1, y-1)) == Air:
+            elif minemap.get((x-1, y)) == Air and minemap.get((x-1, y-1)) == Air:
+                 minemap[coord] = Air
+                 minemap[(x-1, y-1)] = Rock
         if lower == Lambda:
             if minemap.get((x+1, y)) == Air and minemap.get((x+1, y-1)) == Air:
                 minemap[coord] = Air
