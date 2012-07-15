@@ -22,8 +22,10 @@ class MapOccupier(object):
 
 
 class Minemap(dict):
-    def __init__(self, metadata=dict()):
+    def __init__(self, metadata=None):
         #Things like Growth and Water
+        if not metadata:
+            metadata = dict()
         self.metadata = metadata
         self.next_map = None
 
@@ -33,15 +35,15 @@ class Minemap(dict):
         super(Minemap, self.next_map).__setitem__(key, value)
 
     def __str__(self):
-#        for row in xrange(self.metadata['dims'][0]):
-#            print ':',
-#            for col in xrange(self.metadata['dims'][1]):
-#                print self [(row, col)],
-        result = ''
-        result += super(Minemap, self).__str__()
+        import pprint
 
-        from pprint import pformat
-        result += '\n'+pformat(self.metadata)
+        result = ''
+        for row in xrange(self.metadata['dims'][0]-1, -1, -1):
+            result += '\n:'
+            for col in xrange(self.metadata['dims'][1]):
+                result += self[(col, row)].get_char()
+
+        result += '\n'+pprint.pformat(self.metadata)
         return result
 
     def set_metadata(self, key, value):
@@ -49,21 +51,22 @@ class Minemap(dict):
 
     def get_next_map(self):
         next_map = self.next_map.clone()
-        next_map.next_map = Minemap()
-        return self.next_map
+        next_map.next_map = Minemap(self.next_map.metadata)
+        return next_map
 
     def run_robot(self, move):
         Robot.tick(self, self.metadata['robot_coord'], move)
 
     def clone(self):
-        my_clone = Minemap(metadata.copy())
+        my_clone = Minemap(self.metadata.copy())
         my_clone.update(self.copy())
-        return myclone
+        return my_clone
 
     def tick(self):
         #call update on all tiles
-        #write update stuff to new map and return it
-        return next_map
+        for y in xrange(self.metadata['dims'][0]):
+            for x in xrange(self.metadata['dims'][1]):
+                self[(x, y)].tick(self, (x, y))
 
 
 class Earth(MapOccupier):
@@ -77,13 +80,12 @@ class Air(MapOccupier):
     def get_char():
         return ' '
 
-
 class LambdaLift(MapOccupier):
     @staticmethod
     def tick(minemap, coord):
         if minemap.metadata.get("lambdas_remaining") == 0:
             minemap.metadata["lift_is_open"] = True
-    
+
     @staticmethod
     def get_char():
         return 'L'
@@ -114,7 +116,7 @@ class Beard(MapOccupier):
             for c in get_adjacent_coords(coord):
                 if minemap.get(c) == Air:
                     minemap[c] = Beard
-    
+
     @staticmethod
     def get_char():
         return 'W'
@@ -136,7 +138,7 @@ class Rock(MapOccupier):
     @staticmethod
     def get_char():
         return '*'
-    
+
     @staticmethod
     def tick(minemap, coord):
         x, y = coord
@@ -160,26 +162,26 @@ class Robot(MapOccupier):
     @staticmethod
     def get_char():
         return 'R'
-    
+
     @staticmethod
     def wait(minemap, coord):
-        pass
+        minemap[coord] = Robot
 
     @staticmethod
     def moveup(minemap, coord):
-        movev(minemap, coord, "up")
+        Robot.movev(minemap, coord, "up")
 
     @staticmethod
     def movedown(minemap, coord):
-        movev(minemap, coord, "down")
+        Robot.movev(minemap, coord, "down")
 
     @staticmethod
     def moveleft(minemap, coord):
-        moveh(minemap, coord, "left")
+        Robot.moveh(minemap, coord, "left")
 
     @staticmethod
     def moveright(minemap, coord):
-        moveh(minemap, coord, "right")
+        Robot.moveh(minemap, coord, "right")
 
     @staticmethod
     def tick(minemap, coord, move=None):

@@ -12,7 +12,7 @@ def set_map_info(key, value):
     map_info[key] = value
 
 def add_trampoline(tramp, _, target):
-    if not 'Trampolines' in first_map.metadata:
+    if not 'Trampolines' in current_map.metadata:
         map_info['Trampolines'] = {}
     map_info['Trampolines'][tramp] = target
 
@@ -31,6 +31,7 @@ map_funcs = {
     }
 
 if __name__ == '__main__':
+    ## Read input
     map_input = True
     map_grid = []
     line = sys.stdin.readline()
@@ -47,10 +48,11 @@ if __name__ == '__main__':
                 map_funcs[line[0]](*(line[1:]))
         line = sys.stdin.readline()
 
+    ## Create first map
     num_rows = len(map_grid)
-    first_map = levelsim.Minemap()
-    first_map.next_map = levelsim.Minemap()
-    first_map.metadata['dims'] = (num_cols, num_rows)
+    current_map = levelsim.Minemap()
+    current_map.next_map = levelsim.Minemap()
+    current_map.metadata['dims'] = (num_cols, num_rows)
     for row, cells in enumerate(map_grid):
         # Fix coordinate system
         row = (num_rows-1)-row
@@ -61,20 +63,35 @@ if __name__ == '__main__':
                 if not 't_coords' in map_info:
                     map_info['t_coords'] = {}
                 map_info['t_coords'][c] = (row, col)
-            first_map[(col, row)] = levelsim.tile_map[c]
+            current_map[(col, row)] = levelsim.tile_map[c]
 
+    ## Associate "metadata"
     if 'Trampolines' in map_info:
-        first_map.metadata['Trampolines'] = {}
-        first_map.metadata['Targets'] = {}
+        current_map.metadata['Trampolines'] = {}
+        current_map.metadata['Targets'] = {}
         for tramp, target in map_info.iteritems():
             tramp_coord = map_info['t_coords'][tramp]
             target_coord = map_info['t_coords'][target]
-            first_map.metadata['Trampolines'][tramp_coord] = target_coord
-            if not target_coord in first_map.metadata['Targets']:
-                first_map.metadata['Targets'][target_coord] = []
-            first_map.metadata['Targets'][target_coord].append(tramp_coord)
+            current_map.metadata['Trampolines'][tramp_coord] = target_coord
+            if not target_coord in current_map.metadata['Targets']:
+                current_map.metadata['Targets'][target_coord] = []
+            current_map.metadata['Targets'][target_coord].append(tramp_coord)
         del map_info['Trampolines']
         del map_info['Targets']
-        first_map.metadata.update(map_info)
+        current_map.metadata.update(map_info)
 
-    print first_map
+    ## Do the first flip to a working map since we're in an odd state
+    current_map.next_map.metadata = current_map.metadata.copy()
+    current_map = current_map.get_next_map()
+
+    ## Run motherfucker run!!!
+    for move in 'LWWWW':
+        print current_map
+        print 'I\'m now moving %s' % move
+        current_map.run_robot(move)
+        current_map.tick()
+        current_map = current_map.get_next_map()
+
+    print current_map
+
+
