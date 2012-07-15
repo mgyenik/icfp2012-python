@@ -29,6 +29,9 @@ class Minemap(dict):
             self.metadata['robot_coord'] = key
         super(Minemap, self.next_map).__setitem__(key, value)
 
+    def set_metadata(self, key, value):
+        self.metadata[key] = value
+
     def get_next_map(self):
         next_map = self.next_map.clone()
         next_map.next_map = Minemap()
