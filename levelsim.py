@@ -136,6 +136,15 @@ class Robot(MapOccupier):
         Robot.actions[move](minemap, coord)
 
     @staticmethod
+    def shave(minemap, coord):
+        razors = minemap.metadata.get("Razors")
+        if razors > 0:
+            minemap.metadata["Razors"] = razors-1
+            for c in get_adjacent_coords:
+                if minemap.get(c) == Beard:
+                    minemap[c] = Air
+            
+    @staticmethod
     def moveh(minemap, coord, move):
         x, y = coord
         dx, dy = moves.get(move)
