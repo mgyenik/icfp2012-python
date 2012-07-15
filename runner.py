@@ -1,4 +1,5 @@
 import levelsim
+import solver
 import sys
 
 # Water 0
@@ -49,6 +50,7 @@ if __name__ == '__main__':
         line = sys.stdin.readline()
 
     ## Create first map
+    map_info['lambdas'] = 0
     num_rows = len(map_grid)
     current_map = levelsim.Minemap()
     current_map.next_map = levelsim.Minemap()
@@ -63,7 +65,14 @@ if __name__ == '__main__':
                 if not 't_coords' in map_info:
                     map_info['t_coords'] = {}
                 map_info['t_coords'][c] = (row, col)
-            current_map[(col, row)] = levelsim.tile_map[c]
+
+            # Sometimes they won't give us appropriate metadata... we'll
+            # have to keep track of what hazards this map has.
+            tile = levelsim.tile_map[c]
+            if tile == levelsim.Lambda:
+                map_info['lambdas'] += 1
+
+            current_map[(col, row)] = tile
 
     ## Associate "metadata"
     if 'Trampolines' in map_info:
@@ -78,14 +87,25 @@ if __name__ == '__main__':
             current_map.metadata['Targets'][target_coord].append(tramp_coord)
         del map_info['Trampolines']
         del map_info['Targets']
-        current_map.metadata.update(map_info)
+
+    current_map.metadata.update(map_info)
+    current_map.metadata['score'] = 0
+    current_map.metadata['moves'] = ''
+    current_map.metadata['alive'] = True
+    current_map.metadata['lambdas_remaining'] = map_info['lambdas']
 
     ## Do the first flip to a working map since we're in an odd state
     current_map.next_map.metadata = current_map.metadata.copy()
     current_map = current_map.get_next_map()
 
     ## Run motherfucker run!!!
-    for move in sys.argv[1]:
+
+    if len(sys.argv) < 2:
+        solution = solver.solve(current_map)
+    else:
+        solution = sys.argv[1]
+
+    for move in solution:
         print current_map
         print 'I\'m now moving %s' % move
         current_map.run_robot(move)
@@ -93,5 +113,3 @@ if __name__ == '__main__':
         current_map = current_map.get_next_map()
 
     print current_map
-
-

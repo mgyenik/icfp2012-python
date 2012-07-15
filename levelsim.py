@@ -59,6 +59,9 @@ class Minemap(dict):
         return next_map
 
     def run_robot(self, move):
+        self.next_map.metadata['score'] -= 1
+        self.next_map.metadata['moves'] += move
+
         tmp_map = self.clone()
         tmp_map.next_map = self
         Robot.tick(tmp_map, self.metadata['robot_coord'], move)
@@ -67,6 +70,8 @@ class Minemap(dict):
     def clone(self):
         my_clone = Minemap(self.metadata.copy())
         my_clone.update(self.copy())
+        if not self.next_map is None:
+            my_clone.next_map = self.next_map.clone()
         return my_clone
 
     def tick(self):
@@ -151,25 +156,34 @@ class Rock(MapOccupier):
         return '*'
 
     @staticmethod
+    def move_rock(minemap, coord):
+        minemap[coord] = Rock
+        x, y = coord
+        lower = minemap.get((x, y-1))
+        if lower == Robot:
+            minemap.metadata['alive'] = False
+
+
+    @staticmethod
     def tick(minemap, coord):
         x, y = coord
         lower = minemap.get((x, y-1))
         if lower == Air:
             minemap[coord] = Air
-            minemap[(x, y-1)] = Rock
+            Rock.move_rock(minemap, (x, y-1))
         elif lower == Rock:
             if minemap.get((x+1, y)) == Air and minemap.get((x+1, y-1)) == Air:
                 minemap[coord] = Air
-                minemap[(x+1, y-1)] = Rock
+                Rock.move_rock(minemap, (x+1, y-1))
             elif minemap.get((x-1, y)) == Air and minemap.get((x-1, y-1)) == Air:
                  minemap[coord] = Air
-                 minemap[(x-1, y-1)] = Rock
+                 Rock.move_rock(minemap, (x-1, y-1))
             else:
                 minemap[coord] = Rock
         elif lower == Lambda:
             if minemap.get((x+1, y)) == Air and minemap.get((x+1, y-1)) == Air:
                 minemap[coord] = Air
-                minemap[(x+1, y-1)] = Rock
+                Rock.move_rock(minemap, (x+1, y-1))
             else:
                 minemap[coord] = Rock
         else:
@@ -212,6 +226,8 @@ class Robot(MapOccupier):
             for c in get_adjacent_coords:
                 if minemap.get(c) == Beard:
                     minemap[c] = Air
+        else:
+            Robot.wait(minemap, coord)
 
     @staticmethod
     def moveh(minemap, coord, move):
@@ -223,6 +239,7 @@ class Robot(MapOccupier):
             minemap[coord] = Air
             minemap[(xp, y)] = Robot
         elif dest == Lambda:
+            minemap.metadata["score"] += 25
             minemap.metadata["lambdas_remaining"] = minemap.metadata.get("lambdas_remaining") - 1
             minemap[(xp, y)] = Robot
             minemap[coord] = Air
@@ -236,13 +253,10 @@ class Robot(MapOccupier):
                 minemap[(xpp, y)] = Rock
                 minemap[(xp, y)] = Robot
                 minemap[coord] = Air
-                print "foo"
-                print minemap.next_map
             else:
-                minemap[coord] = Robot
+                Robot.wait(minemap, coord)
         else:
-            print "default case"
-            minemap[coord] = Robot
+            Robot.wait(minemap, coord)
 
     @staticmethod
     def movev(minemap, coord, move):
@@ -255,14 +269,14 @@ class Robot(MapOccupier):
             minemap[(x, yp)] = Robot
         elif dest == Lambda:
             minemap.metadata["lambdas_remaining"] = minemap.metadata.get("lambdas_remaining") - 1
-            minemap[(xp, y)] = Robot
+            minemap[(x, yp)] = Robot
             minemap[coord] = Air
         elif dest == Razor:
             minemap.metadata["Razors"] = minemap.metadata.get("Razors") + 1
-            minemap[(xp, y)] = Robot
+            minemap[(x, yp)] = Robot
             minemap[coord] = Air
         else:
-            minemap[coord] = Robot
+            Robot.wait(minemap, coord)
 
 tile_map = {
     ' ': Air,
