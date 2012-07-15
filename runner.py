@@ -85,7 +85,7 @@ if __name__ == '__main__':
     current_map = current_map.get_next_map()
 
     ## Run motherfucker run!!!
-    for move in 'LWWWW':
+    for move in sys.argv[1]:
         print current_map
         print 'I\'m now moving %s' % move
         current_map.run_robot(move)

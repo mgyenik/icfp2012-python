@@ -221,7 +221,7 @@ class Robot(MapOccupier):
         dest = minemap.get((xp, y))
         if dest == Air or dest == Earth:
             minemap[coord] = Air
-            minemap[dest] = Robot
+            minemap[(xp, y)] = Robot
         elif dest == Lambda:
             minemap.metadata["lambdas_remaining"] = minemap.metadata.get("lambdas_remaining") - 1
             minemap[(xp, y)] = Robot
@@ -303,4 +303,3 @@ robot_actions = {
     "W":Robot.wait,
     None:Robot.wait,
 }
-
