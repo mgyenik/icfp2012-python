@@ -9,26 +9,26 @@ moves = dict({
 
 class MapOccupier(object):
 
-    def __init__(self, new_coords=(0, 0)):
-        self.coords = new_coords
-
-    def update(self):
+    def tick(self):
         raise NotImplementedError("update not implemented")
 
 
-class Minemap(object):
-    def __init__(self, linkmap=None, metadata=dict()):
-        #This is the map
-        self.tiles = []
+class Minemap(dict):
+    def __init__(self, metadata=dict()):
         #Things like Growth and Water
         self.metadata = metadata
-        if not linkmap:
-            self.next_map = Minemap(self)
-        else:
-            self.next_map = linkmap
-        #do some stuff
 
-    def update(self):
+    def __setitem__(self, key, value):
+        if value == Robot:
+            self.metadata['robot_coord'] = key
+        super(Minemap, self.next_map).__setitem__(key, value)
+
+    def clone(self):
+        my_clone = Minemap(metadata.copy())
+        my_clone.update(self.copy())
+        return myclone
+
+    def tick(self):
         #call update on all tiles
         #write update stuff to new map and return it
         return next_map
@@ -36,30 +36,41 @@ class Minemap(object):
 
 class Earth(MapOccupier):
 
-    def move(self, move):
-        x, y = coords
-        dx, dy = moves.get(move)
-        coords = (x+dx, y+dy)
-
-    def update(self, minemap):
+    @staticmethod
+    def tick(minemap):
         #check around you in minemap and update accordingly
         return self
 
+
 class Air(MapOccupier):
-    def update(self, minemap):
+
+    @staticmethod
+    def tick(minemap):
         #I MAKE NO CHANGES
         pass
+
+
+class LambdaLift(MapOccupier):
+    isopen = False
+    @staticmethod
+    def tick():
+        if Lambda.lambdas_remaining == 0:
+            isopen = True
+
+
 class Lambda(MapOccupier):
+    lambdasremaining = 0
     @staticmethod
     def tick():
         pass
 
+
 class Rock(MapOccupier):
     
     @staticmethod
-    def update(minemap, coord):
+    def tick(minemap, coord):
         x, y = coord
-        lower = minemap.get(x, y-1)
+        lower = minemap.get((x, y-1))
         if lower == Air:
             minemap[coord] = Air
             minemap[(x, y-1)] = Rock
@@ -68,14 +79,13 @@ class Rock(MapOccupier):
                 minemap[coord] = Air
                 minemap[(x+1, y-1)] = Rock
              else if minemap.get((x-1, y)) == Air and minemap.get((x-1, y-1)) == Air:
-        if lower == Lambda
-
-
-        #check around you in minemap and update accordingly
-        return self
-
+        if lower == Lambda:
+            if minemap.get((x+1, y)) == Air and minemap.get((x+1, y-1)) == Air:
+                minemap[coord] = Air
+                minemap[(x+1, y-1)] = Rock
 
 class Robot(MapOccupier):
 
-    def update(self, minemap):
-        return self
+    @staticmethod
+    def tick(minemap):
+        pass
