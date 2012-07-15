@@ -67,11 +67,15 @@ class Minemap(dict):
 
 
 class Earth(MapOccupier):
-    pass
+    @staticmethod
+    def get_char():
+        return '.'
 
 
 class Air(MapOccupier):
-    pass
+    @staticmethod
+    def get_char():
+        return ' '
 
 
 class LambdaLift(MapOccupier):
@@ -79,18 +83,28 @@ class LambdaLift(MapOccupier):
     def tick(minemap, coord):
         if minemap.metadata.get("lambdas_remaining") == 0:
             minemap.metadata["lift_is_open"] = True
+    
+    @staticmethod
+    def get_char():
+        return 'L'
 
 
 class Razor(MapOccupier):
-    pass
+    @staticmethod
+    def get_char():
+        return '!'
 
 
 class Trampoline(MapOccupier):
-    pass
+    @staticmethod
+    def get_char():
+        return 'A'
 
 
 class Target(MapOccupier):
-    pass
+    @staticmethod
+    def get_char():
+        return '1'
 
 
 class Beard(MapOccupier):
@@ -100,17 +114,29 @@ class Beard(MapOccupier):
             for c in get_adjacent_coords(coord):
                 if minemap.get(c) == Air:
                     minemap[c] = Beard
+    
+    @staticmethod
+    def get_char():
+        return 'W'
 
 
 class Lambda(MapOccupier):
-    pass
+    @staticmethod
+    def get_char():
+        return '\\'
 
 
 class Wall(MapOccupier):
-    pass
+    @staticmethod
+    def get_char():
+        return '#'
 
 
 class Rock(MapOccupier):
+    @staticmethod
+    def get_char():
+        return '*'
+    
     @staticmethod
     def tick(minemap, coord):
         x, y = coord
@@ -131,6 +157,10 @@ class Rock(MapOccupier):
                 minemap[(x+1, y-1)] = Rock
 
 class Robot(MapOccupier):
+    @staticmethod
+    def get_char():
+        return 'R'
+    
     @staticmethod
     def wait(minemap, coord):
         pass
