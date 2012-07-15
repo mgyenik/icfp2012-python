@@ -85,6 +85,8 @@ class LambdaLift(MapOccupier):
     def tick(minemap, coord):
         if minemap.metadata.get("lambdas_remaining") == 0:
             minemap.metadata["lift_is_open"] = True
+        else:
+            minemap[coord] = LambdaLift
 
     @staticmethod
     def get_char():
@@ -116,6 +118,8 @@ class Beard(MapOccupier):
             for c in get_adjacent_coords(coord):
                 if minemap.get(c) == Air:
                     minemap[c] = Beard
+        else:
+            minemap[coord] = Beard
 
     @staticmethod
     def get_char():
@@ -280,6 +284,7 @@ robot_actions = {
     "R":Robot.moveright,
     "U":Robot.moveup,
     "D":Robot.movedown,
-    None:Robot.wait
+    "W":Robot.wait,
+    None:Robot.wait,
 }
 
