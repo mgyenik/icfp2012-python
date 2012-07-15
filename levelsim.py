@@ -41,7 +41,11 @@ class Minemap(dict):
         for row in xrange(self.metadata['dims'][0]-1, -1, -1):
             result += '\n:'
             for col in xrange(self.metadata['dims'][1]):
-                result += self[(col, row)].get_char()
+                cell = self.get((col, row))
+                if cell:
+                    result += cell.get_char()
+                else:
+                    result += '?'
 
         result += '\n'+pprint.pformat(self.metadata)
         return result
@@ -55,7 +59,10 @@ class Minemap(dict):
         return next_map
 
     def run_robot(self, move):
-        Robot.tick(self, self.metadata['robot_coord'], move)
+        tmp_map = self.clone()
+        tmp_map.next_map = self
+        Robot.tick(tmp_map, self.metadata['robot_coord'], move)
+        self.next_map.metadata['robot_coord'] = tmp_map.metadata['robot_coord']
 
     def clone(self):
         my_clone = Minemap(self.metadata.copy())
@@ -229,6 +236,10 @@ class Robot(MapOccupier):
                 minemap[(xpp, y)] = Rock
                 minemap[(xp, y)] = Robot
                 minemap[coord] = Air
+                print "foo"
+                print minemap.next_map
+            else:
+                minemap[coord] = Robot
         else:
             print "default case"
             minemap[coord] = Robot
