@@ -13,19 +13,29 @@ def get_adjacent_coords(coord):
 
 class MapOccupier(object):
 
-    def tick(self):
-        raise NotImplementedError("update not implemented")
+    @classmethod
+    def tick(cls, minemap, coord):
+        minemap[coord] = cls
 
 
 class Minemap(dict):
     def __init__(self, metadata=dict()):
         #Things like Growth and Water
         self.metadata = metadata
+        self.next_map = None
 
     def __setitem__(self, key, value):
         if value == Robot:
             self.metadata['robot_coord'] = key
         super(Minemap, self.next_map).__setitem__(key, value)
+
+    def get_next_map(self):
+        next_map = self.next_map.clone()
+        next_map.next_map = Minemap()
+        return self.next_map
+
+    def run_robot(self, move):
+        Robot.tick(self, self.metadata['robot_coord'], move)
 
     def clone(self):
         my_clone = Minemap(metadata.copy())
@@ -39,16 +49,11 @@ class Minemap(dict):
 
 
 class Earth(MapOccupier):
-    @staticmethod
-    def tick(minemap, coord):
-        pass
+    pass
 
 
 class Air(MapOccupier):
-    @staticmethod
-    def tick(minemap, coord):
-        #I MAKE NO CHANGES
-        pass
+    pass
 
 
 class LambdaLift(MapOccupier):
@@ -59,9 +64,7 @@ class LambdaLift(MapOccupier):
 
 
 class Lambda(MapOccupier):
-    @staticmethod
-    def tick(minemap, coord):
-        pass
+    pass
 
 
 class Beard(MapOccupier):
@@ -95,5 +98,5 @@ class Rock(MapOccupier):
 
 class Robot(MapOccupier):
     @staticmethod
-    def tick(minemap, coord):
-        pass
+    def tick(minemap, coord, move=None):
+        Robot.actions[move](minemap, coord)
