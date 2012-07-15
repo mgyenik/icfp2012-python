@@ -7,6 +7,10 @@ moves = dict({
     })
 
 
+def get_adjacent_coords(coord):
+    x, y = coord
+    return [(x-1, y-1), (x-1, y), (x-1, y+1), (x, y+1), (x+1, y+1), (x+1, y), (x+1, y-1), (x, y-1)]
+
 class MapOccupier(object):
 
     def tick(self):
@@ -35,38 +39,41 @@ class Minemap(dict):
 
 
 class Earth(MapOccupier):
-
     @staticmethod
-    def tick(minemap):
-        #check around you in minemap and update accordingly
-        return self
+    def tick(minemap, coord):
+        pass
 
 
 class Air(MapOccupier):
-
     @staticmethod
-    def tick(minemap):
+    def tick(minemap, coord):
         #I MAKE NO CHANGES
         pass
 
 
 class LambdaLift(MapOccupier):
-    isopen = False
     @staticmethod
-    def tick():
-        if Lambda.lambdas_remaining == 0:
-            isopen = True
+    def tick(minemap, coord):
+        if minemap.metadata.get("lambdas_remaining") == 0:
+            minemap.metadata["liftisopen"] = True
 
 
 class Lambda(MapOccupier):
-    lambdasremaining = 0
     @staticmethod
-    def tick():
+    def tick(minemap, coord):
         pass
 
 
+class Beard(MapOccupier):
+    @staticmethod
+    def tick(minemap, coord):
+        if minemap.metadata.get("G") == 0:
+            for c in get_adjacent_coords(coord):
+                if minemap.get(c) == Air:
+                    minemap[c] = Beard
+
+
 class Rock(MapOccupier):
-    
     @staticmethod
     def tick(minemap, coord):
         x, y = coord
@@ -87,7 +94,6 @@ class Rock(MapOccupier):
                 minemap[(x+1, y-1)] = Rock
 
 class Robot(MapOccupier):
-
     @staticmethod
-    def tick(minemap):
+    def tick(minemap, coord):
         pass
