@@ -144,17 +144,19 @@ class Rock(MapOccupier):
         if lower == Air:
             minemap[coord] = Air
             minemap[(x, y-1)] = Rock
-        if lower == Rock:
+        elif lower == Rock:
             if minemap.get((x+1, y)) == Air and minemap.get((x+1, y-1)) == Air:
                 minemap[coord] = Air
                 minemap[(x+1, y-1)] = Rock
             elif minemap.get((x-1, y)) == Air and minemap.get((x-1, y-1)) == Air:
                  minemap[coord] = Air
                  minemap[(x-1, y-1)] = Rock
-        if lower == Lambda:
+        elif lower == Lambda:
             if minemap.get((x+1, y)) == Air and minemap.get((x+1, y-1)) == Air:
                 minemap[coord] = Air
                 minemap[(x+1, y-1)] = Rock
+        else:
+            minemap[coord] = Rock
 
 class Robot(MapOccupier):
     @staticmethod
@@ -217,6 +219,8 @@ class Robot(MapOccupier):
                 minemap[(xpp, y)] = Rock
                 minemap[(xp, y)] = Robot
                 minemap[coord] = Air
+        else:
+            minemap[coord] = Robot
 
     @staticmethod
     def movev(minemap, coord, move):
@@ -235,6 +239,8 @@ class Robot(MapOccupier):
             minemap.metadata["Razors"] = minemap.metadata.get("Razors") + 1
             minemap[(xp, y)] = Robot
             minemap[coord] = Air
+        else:
+            minemap[coord] = Robot
 
 tile_map = {
     ' ': Air,
