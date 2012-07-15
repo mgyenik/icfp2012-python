@@ -34,30 +34,34 @@ if __name__ == '__main__':
     map_input = True
     map_grid = []
     line = sys.stdin.readline()
-    max_len = 0
+    num_cols = 0
     while line:
         line = line.strip()
         if map_input and line:
-            if len(line) > max_len:
-                max_len = len(line)
+            if len(line) > num_cols:
+                num_cols = len(line)
             map_grid.append(list(line))
         else:
             if line:
                 line = line.split()
-                map_funcs[line[0]](line[1:]*)
+                map_funcs[line[0]](*(line[1:]))
         line = sys.stdin.readline()
 
+    num_rows = len(map_grid)
     first_map = levelsim.Minemap()
-    first_map.metadata['dims'] = (max_len, len(map_grid))
+    first_map.next_map = levelsim.Minemap()
+    first_map.metadata['dims'] = (num_cols, num_rows)
     for row, cells in enumerate(map_grid):
-        if len(cells) < max_len:
-            cells.append([levelsim.Air]*(max_len-len(cells)))
+        # Fix coordinate system
+        row = (num_rows-1)-row
+        if len(cells) < num_cols:
+            cells.append([levelsim.Air]*(num_cols-len(cells)))
         for col, c in enumerate(cells):
             if c in 'ABCDEFGHI123456789':
                 if not 't_coords' in map_info:
                     map_info['t_coords'] = {}
                 map_info['t_coords'][c] = (row, col)
-            first_map[(row, col)] = levelsim.tile_map[c]
+            first_map[(col, row)] = levelsim.tile_map[c]
 
     if 'Trampolines' in map_info:
         first_map.metadata['Trampolines'] = {}

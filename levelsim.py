@@ -14,6 +14,10 @@ def get_adjacent_coords(coord):
 class MapOccupier(object):
 
     @classmethod
+    def get_char(cls):
+        raise NotImplementedError("'%s' does not yet provide get_char" % cls)
+
+    @classmethod
     def tick(cls, minemap, coord):
         minemap[coord] = cls
 
@@ -30,13 +34,16 @@ class Minemap(dict):
         super(Minemap, self.next_map).__setitem__(key, value)
 
     def __str__(self):
-        for row in xrange(self.metadata['dims'][0]):
-            print ':',
-            for col in xrange(self.metadata['dims'][1]):
-                print self[row,col],
+#        for row in xrange(self.metadata['dims'][0]):
+#            print ':',
+#            for col in xrange(self.metadata['dims'][1]):
+#                print self [(row, col)],
+        result = ''
+        result += super(Minemap, self).__str__()
 
-        from pprint import pprint
-        pprint(self.metadata)
+        from pprint import pformat
+        result += '\n'+pformat(self.metadata)
+        return result
 
     def set_metadata(self, key, value):
         self.metadata[key] = value
@@ -75,7 +82,15 @@ class LambdaLift(MapOccupier):
             minemap.metadata["lift_is_open"] = True
 
 
-class Lambda(MapOccupier):
+class Razor(MapOccupier):
+    pass
+
+
+class Trampoline(MapOccupier):
+    pass
+
+
+class Target(MapOccupier):
     pass
 
 
@@ -87,6 +102,9 @@ class Beard(MapOccupier):
                 if minemap.get(c) == Air:
                     minemap[c] = Beard
 
+
+class Lambda(MapOccupier):
+    pass
 
 
 class Wall(MapOccupier):
@@ -177,7 +195,7 @@ tile_map = {
     ' ': Air,
     '.': Earth,
     '\\': Lambda,
-    'L': Lift,
+    'L': LambdaLift,
     'R': Robot,
     '*': Rock,
     '#': Wall,
