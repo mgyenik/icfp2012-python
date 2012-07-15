@@ -45,15 +45,32 @@ class Earth(MapOccupier):
         #check around you in minemap and update accordingly
         return self
 
+class Air(MapOccupier):
+    def update(self, minemap):
+        #I MAKE NO CHANGES
+        pass
+class Lambda(MapOccupier):
+    @staticmethod
+    def tick():
+        pass
 
 class Rock(MapOccupier):
+    
+    @staticmethod
+    def update(minemap, coord):
+        x, y = coord
+        lower = minemap.get(x, y-1)
+        if lower == Air:
+            minemap[coord] = Air
+            minemap[(x, y-1)] = Rock
+        if lower == Rock:
+            if minemap.get((x+1, y)) == Air and minemap.get((x+1, y-1)) == Air:
+                minemap[coord] = Air
+                minemap[(x+1, y-1)] = Rock
+             else if minemap.get((x-1, y)) == Air and minemap.get((x-1, y-1)) == Air:
+        if lower == Lambda
 
-    def move(self, move):
-        x, y = coords
-        dx, dy = moves.get(move)
-        coords = (x+dx, y+dy)
 
-    def update(self, minemap):
         #check around you in minemap and update accordingly
         return self
 
