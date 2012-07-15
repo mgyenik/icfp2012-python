@@ -153,11 +153,19 @@ class Robot(MapOccupier):
         if dest == Air or dest == Earth:
             minemap[coord] = Air
             minemap[dest] = Robot
-        if dest == Rock:
+        elif dest == Lambda:
+            minemap.metadata["lambdas_remaining"] = minemap.metadata.get("lambdas_remaining") - 1
+            minemap[(xp, y)] = Robot
+            minemap[coord] = air
+        elif dest == Razor:
+            minemap.metadata["Razors"] = minemap.metadata.get("Razors") + 1
+            minemap[(xp, y)] = Robot
+            minemap[coord] = Air
+        elif dest == Rock:
             xpp = xp+dx;
             if minemap.get((xpp, y)) == Air:
                 minemap[(xpp, y)] = Rock
-                minemap[dest] = Robot
+                minemap[(xp, y)] = Robot
                 minemap[coord] = Air
     
     @staticmethod
@@ -168,5 +176,13 @@ class Robot(MapOccupier):
         dest = minemap.get((x, yp))
         if dest == Air or dest == Earth:
             minemap[coord] = Air
-            minemap[dest] = Robot
+            minemap[(x, yp)] = Robot
+        elif dest == Lambda:
+            minemap.metadata["lambdas_remaining"] = minemap.metadata.get("lambdas_remaining") - 1
+            minemap[(xp, y)] = Robot
+            minemap[coord] = air
+        elif dest == Razor:
+            minemap.metadata["Razors"] = minemap.metadata.get("Razors") + 1
+            minemap[(xp, y)] = Robot
+            minemap[coord] = Air
 
