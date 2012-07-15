@@ -29,6 +29,15 @@ class Minemap(dict):
             self.metadata['robot_coord'] = key
         super(Minemap, self.next_map).__setitem__(key, value)
 
+    def __str__(self):
+        for row in xrange(self.metadata['dims'][0]):
+            print ':',
+            for col in xrange(self.metadata['dims'][1]):
+                print self[row,col],
+
+        from pprint import pprint
+        pprint(self.metadata)
+
     def set_metadata(self, key, value):
         self.metadata[key] = value
 
@@ -105,15 +114,6 @@ class Rock(MapOccupier):
                 minemap[(x+1, y-1)] = Rock
 
 class Robot(MapOccupier):
-    actions = {
-        "S":Robot.shave,
-        "L":Robot.moveleft,
-        "R":Robot.moveright,
-        "U":Robot.moveup,
-        "D":Robot.movedown,
-        None:Robot.wait
-    }
-
     @staticmethod
     def wait(minemap, coord):
         pass
@@ -136,7 +136,7 @@ class Robot(MapOccupier):
 
     @staticmethod
     def tick(minemap, coord, move=None):
-        Robot.actions[move](minemap, coord)
+        robot_actions[move](minemap, coord)
 
     @staticmethod
     def shave(minemap, coord):
@@ -146,7 +146,7 @@ class Robot(MapOccupier):
             for c in get_adjacent_coords:
                 if minemap.get(c) == Beard:
                     minemap[c] = Air
-            
+
     @staticmethod
     def moveh(minemap, coord, move):
         x, y = coord
@@ -162,7 +162,7 @@ class Robot(MapOccupier):
                 minemap[(xpp, y)] = Rock
                 minemap[dest] = Robot
                 minemap[coord] = Air
-    
+
     @staticmethod
     def movev(minemap, coord, move):
         x, y = coord
@@ -172,4 +172,43 @@ class Robot(MapOccupier):
         if dest == Air or dest == Earth:
             minemap[coord] = Air
             minemap[dest] = Robot
+
+tile_map = {
+    ' ': Air,
+    '.': Earth,
+    '\\': Lambda,
+    'L': Lift,
+    'R': Robot,
+    '*': Rock,
+    '#': Wall,
+    'W': Beard,
+    '!': Razor,
+    'A': Trampoline,
+    'B': Trampoline,
+    'C': Trampoline,
+    'D': Trampoline,
+    'E': Trampoline,
+    'F': Trampoline,
+    'G': Trampoline,
+    'H': Trampoline,
+    'I': Trampoline,
+    '1': Target,
+    '2': Target,
+    '3': Target,
+    '4': Target,
+    '5': Target,
+    '6': Target,
+    '7': Target,
+    '8': Target,
+    '9': Target,
+}
+
+robot_actions = {
+    "S":Robot.shave,
+    "L":Robot.moveleft,
+    "R":Robot.moveright,
+    "U":Robot.moveup,
+    "D":Robot.movedown,
+    None:Robot.wait
+}
 
