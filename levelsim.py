@@ -1,4 +1,3 @@
-
 moves = dict({
         "left" :(-1, 0),
         "right":(1, 0),
@@ -7,9 +6,11 @@ moves = dict({
         "none" :(0, 0)
         })
 
+
 class MapOccupier(object):
     def update(self):
         raise NotImplementedError("update not implemented")
+
 
 class Minemap(object):
     #This is the map
@@ -24,7 +25,6 @@ class Minemap(object):
         #call update on all tiles
         #write update stuff to new map and return it
         return next_map
-
 
 
 class Rock(MapOccupier):
