@@ -1,10 +1,10 @@
-moves = dict({
+moves = {
     "left" :(-1, 0),
     "right":(1, 0),
     "down" :(0, -1),
     "up"   :(0, 1),
     "none" :(0, 0)
-    })
+    }
 
 
 def get_adjacent_coords(coord):
@@ -63,7 +63,7 @@ class LambdaLift(MapOccupier):
     @staticmethod
     def tick(minemap, coord):
         if minemap.metadata.get("lambdas_remaining") == 0:
-            minemap.metadata["liftisopen"] = True
+            minemap.metadata["lift_is_open"] = True
 
 
 class Lambda(MapOccupier):
@@ -77,6 +77,11 @@ class Beard(MapOccupier):
             for c in get_adjacent_coords(coord):
                 if minemap.get(c) == Air:
                     minemap[c] = Beard
+
+
+
+class Wall(MapOccupier):
+    pass
 
 
 class Rock(MapOccupier):
@@ -100,6 +105,71 @@ class Rock(MapOccupier):
                 minemap[(x+1, y-1)] = Rock
 
 class Robot(MapOccupier):
+    actions = {
+        "S":Robot.shave,
+        "L":Robot.moveleft,
+        "R":Robot.moveright,
+        "U":Robot.moveup,
+        "D":Robot.movedown,
+        None:Robot.wait
+    }
+
+    @staticmethod
+    def wait(minemap, coord):
+        pass
+
+    @staticmethod
+    def moveup(minemap, coord):
+        movev(minemap, coord, "up")
+
+    @staticmethod
+    def movedown(minemap, coord):
+        movev(minemap, coord, "down")
+
+    @staticmethod
+    def moveleft(minemap, coord):
+        moveh(minemap, coord, "left")
+
+    @staticmethod
+    def moveright(minemap, coord):
+        moveh(minemap, coord, "right")
+
     @staticmethod
     def tick(minemap, coord, move=None):
         Robot.actions[move](minemap, coord)
+
+    @staticmethod
+    def shave(minemap, coord):
+        razors = minemap.metadata.get("Razors")
+        if razors > 0:
+            minemap.metadata["Razors"] = razors-1
+            for c in get_adjacent_coords:
+                if minemap.get(c) == Beard:
+                    minemap[c] = Air
+            
+    @staticmethod
+    def moveh(minemap, coord, move):
+        x, y = coord
+        dx, dy = moves.get(move)
+        xp = x+dx
+        dest = minemap.get((xp, y))
+        if dest == Air or dest == Earth:
+            minemap[coord] = Air
+            minemap[dest] = Robot
+        if dest == Rock:
+            xpp = xp+dx;
+            if minemap.get((xpp, y)) == Air:
+                minemap[(xpp, y)] = Rock
+                minemap[dest] = Robot
+                minemap[coord] = Air
+    
+    @staticmethod
+    def movev(minemap, coord, move):
+        x, y = coord
+        dx, dy = moves.get(move)
+        yp = y+dy
+        dest = minemap.get((x, yp))
+        if dest == Air or dest == Earth:
+            minemap[coord] = Air
+            minemap[dest] = Robot
+
