@@ -1,10 +1,10 @@
-moves = dict({
+moves = {
     "left" :(-1, 0),
     "right":(1, 0),
     "down" :(0, -1),
     "up"   :(0, 1),
     "none" :(0, 0)
-    })
+    }
 
 
 def get_adjacent_coords(coord):
@@ -73,6 +73,11 @@ class Beard(MapOccupier):
                     minemap[c] = Beard
 
 
+
+class Wall(MapOccupier):
+    pass
+
+
 class Rock(MapOccupier):
     @staticmethod
     def tick(minemap, coord):
@@ -94,6 +99,28 @@ class Rock(MapOccupier):
                 minemap[(x+1, y-1)] = Rock
 
 class Robot(MapOccupier):
+    actions = {
+        "S":Robot.shave,
+        "L":Robot.moveleft,
+        "R":Robot.moveright,
+        "U":Robot.moveup,
+        "D":Robot.movedown,
+        None:Robot.wait
+    }
     @staticmethod
     def tick(minemap, coord):
         pass
+    @staticmethod
+    def moveleft(minemap, coord):
+        x, y = coord
+        dx, dy = moves.get("left")
+        xp = x+dx
+        yp = y+dy
+        dest = minemap.get((xp, yp))
+        if dest == Air:
+            minemap[coord] = Air
+            minemap[dest] = Robot
+        if dest == Rock:
+            #Sheeeeiiit
+
+
