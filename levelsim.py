@@ -17,9 +17,11 @@ class MapOccupier(object):
 
 
 class Minemap(object):
-    def __init__(self, linkmap=None):
+    def __init__(self, linkmap=None, metadata=dict()):
         #This is the map
         self.tiles = []
+        #Things like Growth and Water
+        self.metadata = metadata
         if not linkmap:
             self.next_map = Minemap(self)
         else:
