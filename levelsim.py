@@ -12,7 +12,6 @@ def get_adjacent_coords(coord):
     return [(x-1, y-1), (x-1, y), (x-1, y+1), (x, y+1), (x+1, y+1), (x+1, y), (x+1, y-1), (x, y-1)]
 
 class MapOccupier(object):
-
     @classmethod
     def tick(cls, minemap, coord):
         minemap[coord] = cls
@@ -156,7 +155,7 @@ class Robot(MapOccupier):
         elif dest == Lambda:
             minemap.metadata["lambdas_remaining"] = minemap.metadata.get("lambdas_remaining") - 1
             minemap[(xp, y)] = Robot
-            minemap[coord] = air
+            minemap[coord] = Air
         elif dest == Razor:
             minemap.metadata["Razors"] = minemap.metadata.get("Razors") + 1
             minemap[(xp, y)] = Robot
@@ -180,7 +179,7 @@ class Robot(MapOccupier):
         elif dest == Lambda:
             minemap.metadata["lambdas_remaining"] = minemap.metadata.get("lambdas_remaining") - 1
             minemap[(xp, y)] = Robot
-            minemap[coord] = air
+            minemap[coord] = Air
         elif dest == Razor:
             minemap.metadata["Razors"] = minemap.metadata.get("Razors") + 1
             minemap[(xp, y)] = Robot
